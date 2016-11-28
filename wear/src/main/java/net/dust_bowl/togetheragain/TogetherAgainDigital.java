@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -98,6 +100,7 @@ public class TogetherAgainDigital extends CanvasWatchFaceService
         Paint mTextPaint;
         boolean mAmbient;
         Calendar mCalendar;
+        Bitmap background;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver()
         {
             @Override
@@ -132,6 +135,8 @@ public class TogetherAgainDigital extends CanvasWatchFaceService
             mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
 
             mCalendar = Calendar.getInstance();
+
+            background = new BitmapFactory().decodeResource(getResources(), R.drawable.testbackground);
         }
 
         @Override
@@ -273,7 +278,8 @@ public class TogetherAgainDigital extends CanvasWatchFaceService
                 canvas.drawColor(Color.BLACK);
             } else
             {
-                canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+                //canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+                canvas.drawBitmap(background,0 ,0,  mBackgroundPaint);
             }
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
