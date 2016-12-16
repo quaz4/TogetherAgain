@@ -1,6 +1,7 @@
 package net.dust_bowl.togetheragain;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private static final String TAG = "SignInActivity";
+	private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+		//Hide action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
@@ -42,10 +45,23 @@ public class MainActivity extends AppCompatActivity implements
 
         //Build a GoogleApiClient with access to the Google Sign-In API and the
         //options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+		mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+		//Check if user is already signed in
+		//if(mPreferences.contains("googleID"))
+		//{
+			//Change activity
+
+		//}
+		//else
+		//{
+			//Display sign in button
+			//View gsi = findViewById(R.id.sign_in_button);
+			//gsi.setVisibility(View.VISIBLE);
+		//}
 
     }
 
@@ -82,15 +98,18 @@ public class MainActivity extends AppCompatActivity implements
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if(requestCode == RC_SIGN_IN) {
+        if(requestCode == RC_SIGN_IN)
+		{
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
+    private void handleSignInResult(GoogleSignInResult result)
+	{
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if(result.isSuccess()) {
+        if(result.isSuccess())
+		{
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));

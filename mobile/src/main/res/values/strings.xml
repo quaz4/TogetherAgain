@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TogetherAgain</string>
+    <string name="again">Again</string>
+    <string name="together">Together</string>
 </resources>
