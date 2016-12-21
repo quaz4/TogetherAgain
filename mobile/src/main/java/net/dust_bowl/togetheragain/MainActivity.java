@@ -2,6 +2,7 @@ package net.dust_bowl.togetheragain;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,7 +23,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private static final String TAG = "SignInActivity";
-	private SharedPreferences mPreferences;
+    public static final String LOGIN_PREF = "TogetherAgainLogin";
+	private SharedPreferences googleLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,8 +36,21 @@ public class MainActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        //Button Listeners
+        //Disable login button
+        findViewById(R.id.sign_in_button).setEnabled(false);
+
+        //Assign button listeners
         findViewById(R.id.sign_in_button).setOnClickListener(this);
+
+        googleLogin = getSharedPreferences(LOGIN_PREF, 0);
+
+        if(googleLogin.getString("personId", null) != null)
+        {
+            //TODO Next activity
+        }
+
+        //User not logged in, enable login button
+        findViewById(R.id.sign_in_button).setEnabled(true);
 
         //Configure sign-in to request the user's ID, email address, and basic
         //profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -46,23 +61,9 @@ public class MainActivity extends AppCompatActivity implements
         //Build a GoogleApiClient with access to the Google Sign-In API and the
         //options specified by gso.
 		mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-
-		//Check if user is already signed in
-		//if(mPreferences.contains("googleID"))
-		//{
-			//Change activity
-
-		//}
-		//else
-		//{
-			//Display sign in button
-			//View gsi = findViewById(R.id.sign_in_button);
-			//gsi.setVisibility(View.VISIBLE);
-		//}
-
     }
 
     @Override
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View view)
     {
-        //Used case to make extensions easy later
+        //Used switch to make extensions easy later
         switch(view.getId())
         {
             case R.id.sign_in_button:
@@ -109,16 +110,25 @@ public class MainActivity extends AppCompatActivity implements
 	{
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if(result.isSuccess())
-		{
+        {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            //updateUI(true);
-        }
-        else
-        {
-            // Signed out, show unauthenticated UI.
-            //updateUI(false);
+            String personId = acct.getId();
+            String personPhoto = acct.getPhotoUrl().toString();
+            String personGivenName = acct.getGivenName();
+            String personFamilyName = acct.getFamilyName();
+
+            //Get shared preferences editor
+            SharedPreferences.Editor loginInfoEditor = googleLogin.edit();
+
+            //Save user information
+            loginInfoEditor.putString("personId", personId);
+            loginInfoEditor.putString("personPhoto", personPhoto);
+            loginInfoEditor.putString("personGivenName", personGivenName);
+            loginInfoEditor.putString("personFamilyName", personFamilyName);
+
+            //Commit the edits
+            loginInfoEditor.commit();
         }
     }
 }
