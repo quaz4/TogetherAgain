@@ -129,7 +129,20 @@ public class MainActivity extends AppCompatActivity implements
             loginInfoEditor.putString("personFamilyName", personFamilyName);
 
             //Commit the edits
-            loginInfoEditor.commit();
+            loginInfoEditor.apply();
+
+			enterNavigationActivity();
         }
+    }
+
+    private void enterNavigationActivity()
+    {
+        Intent intent = new Intent(this, NavigationActivity.class);
+        /*
+        EditText editText = (EditText) findViewById(R.id.edit_message);
+        String message = editText.getText().toString();
+        intent.putExtra(EXTRA_MESSAGE, message);
+        */
+		startActivity(intent);
     }
 }
