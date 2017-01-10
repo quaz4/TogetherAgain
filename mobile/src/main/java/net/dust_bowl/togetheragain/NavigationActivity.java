@@ -110,6 +110,9 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
 		debug.setText(googleLogin.getString("personId", "Nothing found after logout"));
 
 		SharedPreferences.Editor loginInfoEditor = googleLogin.edit();
+		loginInfoEditor.clear();
+		loginInfoEditor.commit();
+
 		loginInfoEditor.putBoolean("logout", true);
 		loginInfoEditor.commit();
 
