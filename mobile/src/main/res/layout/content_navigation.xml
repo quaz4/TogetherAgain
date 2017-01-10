@@ -14,4 +14,12 @@
     tools:context="net.dust_bowl.togetheragain.NavigationActivity"
     tools:showIn="@layout/app_bar_navigation">
 
+    <TextView
+        android:text="Debug..."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="105dp"
+        android:id="@+id/debug"/>
 </RelativeLayout>

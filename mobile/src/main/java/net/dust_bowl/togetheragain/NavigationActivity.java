@@ -1,9 +1,8 @@
 package net.dust_bowl.togetheragain;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,9 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 public class NavigationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener
 {
+
+	public static final String LOGIN_PREF = "TogetherAgainLogin";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -33,6 +35,11 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
+
+		//DEBUG
+		SharedPreferences googleLogin = getSharedPreferences(LOGIN_PREF, 0);
+		TextView debug = (TextView) findViewById(R.id.debug);
+		debug.setText(googleLogin.getString("personId", "Nothing found after logout"));
 	}
 
 	@Override
@@ -65,8 +72,9 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
 		int id = item.getItemId();
 
 		//noinspection SimplifiableIfStatement
-		if(id == R.id.action_settings)
+		if(id == R.id.action_logout)
 		{
+			logout();
 			return true;
 		}
 
@@ -92,5 +100,22 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 		drawer.closeDrawer(GravityCompat.START);
 		return true;
+	}
+
+	public void logout()
+	{
+		//DEBUG
+		SharedPreferences googleLogin = getSharedPreferences(LOGIN_PREF, 0);
+		TextView debug = (TextView) findViewById(R.id.debug);
+		debug.setText(googleLogin.getString("personId", "Nothing found after logout"));
+
+		SharedPreferences.Editor loginInfoEditor = googleLogin.edit();
+		loginInfoEditor.putBoolean("logout", true);
+		loginInfoEditor.commit();
+
+		//getBaseContext() could be "getBaseContext()"?
+		Intent intent = new Intent(NavigationActivity.this, MainActivity.class);
+		//intent.putExtra("LOGOUT_INTENT", true);
+		startActivity(intent);
 	}
 }

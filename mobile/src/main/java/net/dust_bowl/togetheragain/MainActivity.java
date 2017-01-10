@@ -2,13 +2,11 @@ package net.dust_bowl.togetheragain;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -16,6 +14,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
@@ -43,28 +43,37 @@ public class MainActivity extends AppCompatActivity implements
         //Assign button listeners
         findViewById(R.id.sign_in_button).setOnClickListener(this);
 
+		//Configure sign-in to request the user's ID, email address, and basic
+		//profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+				.requestEmail()
+				.build();
+
+		//Build a GoogleApiClient with access to the Google Sign-In API and the
+		//options specified by gso.
+		mGoogleApiClient = new GoogleApiClient.Builder(this)
+				.enableAutoManage(this, this)
+				.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+				.build();
+
         googleLogin = getSharedPreferences(LOGIN_PREF, 0);
 
-        if(googleLogin.getString("personId", null) != null)
+		//Check if app has returned to login menu as a result of logout action
+		//if(getIntent().getExtras().getBoolean("LOGOUT_INTENT"))
+		if(googleLogin.getBoolean("logout", false) == true)
+		{
+			logout();
+		}
+
+		//If personId isnt "No User"
+        if(!(googleLogin.getString("personId", "Not found").equals("No User")))
         {
-            //TODO Next activity
+			enterNavigationActivity();
         }
 
         //User not logged in, enable login button
         findViewById(R.id.sign_in_button).setEnabled(true);
 
-        //Configure sign-in to request the user's ID, email address, and basic
-        //profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        //Build a GoogleApiClient with access to the Google Sign-In API and the
-        //options specified by gso.
-		mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
     }
 
     @Override
@@ -129,20 +138,38 @@ public class MainActivity extends AppCompatActivity implements
             loginInfoEditor.putString("personFamilyName", personFamilyName);
 
             //Commit the edits
-            loginInfoEditor.apply();
+            loginInfoEditor.commit();
 
 			enterNavigationActivity();
         }
     }
 
+	//Build intent and start NavigationActivity
     private void enterNavigationActivity()
     {
         Intent intent = new Intent(this, NavigationActivity.class);
-        /*
-        EditText editText = (EditText) findViewById(R.id.edit_message);
-        String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
-        */
 		startActivity(intent);
     }
+
+	//TODO Refactor?
+	public void logout()
+	{
+		//Clear SharedPreferences
+		googleLogin = getSharedPreferences(LOGIN_PREF, 0);
+		SharedPreferences.Editor loginInfoEditor = googleLogin.edit();
+		loginInfoEditor.putString("personId", "No User");
+		loginInfoEditor.putBoolean("logout", false);
+		loginInfoEditor.commit();
+
+		//Logout of google account
+		Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+				new ResultCallback<Status>() {
+					@Override
+					public void onResult(Status status)
+					{
+						//Do nothing
+					}
+				});
+	}
+
 }
