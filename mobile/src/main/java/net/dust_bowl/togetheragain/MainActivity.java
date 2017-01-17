@@ -1,5 +1,6 @@
 package net.dust_bowl.togetheragain;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     private void handleSignInResult(GoogleSignInResult result)
 	{
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
@@ -168,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements
             //Commit the edits
             loginInfoEditor.commit();
 
+            //TODO Enable Alarm on login
+
 			enterNavigationActivity();
         }
     }
@@ -182,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements
 	//TODO Refactor?
 	public void logout()
 	{
+        //TODO Disable alarm on logout
+
 		//Clear SharedPreferences
 		//googleLogin = getSharedPreferences(LOGIN_PREF, 0);
 		SharedPreferences.Editor loginInfoEditor = googleLogin.edit();
