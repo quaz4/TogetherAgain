@@ -3,6 +3,7 @@ package net.dust_bowl.togetheragain;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -59,16 +60,19 @@ public class MainActivity extends AppCompatActivity implements
 				.addApi(Auth.GOOGLE_SIGN_IN_API, gso)
 				.build();
 
+        //TODO Check the impact of this...
+        mGoogleApiClient.connect();
+
         googleLogin = getSharedPreferences(LOGIN_PREF, 0);
 
 		//Check if app has returned to login menu as a result of logout action
 		//if(getIntent().getExtras().getBoolean("LOGOUT_INTENT"))
-		if(googleLogin.getBoolean("logout", false) == true)
+		if(googleLogin.getBoolean("logout", false))
 		{
 			logout();
 		}
 
-		//If personId isnt "No User"
+		//If personId isn't "No User"
         if(!(googleLogin.getString("personId", "Not found").equals("No User")))
         {
 			enterNavigationActivity();
@@ -184,7 +188,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 	//TODO Refactor?
-	public void logout()
+	@SuppressLint("CommitPrefEdits")
+    public void logout()
 	{
         //TODO Disable alarm on logout
 
@@ -195,15 +200,25 @@ public class MainActivity extends AppCompatActivity implements
 		loginInfoEditor.putBoolean("logout", false);
 		loginInfoEditor.commit();
 
+        /*
 		//Logout of google account
-		Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(null);
+		Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
 				new ResultCallback<Status>() {
 					@Override
 					public void onResult(Status status)
 					{
 
 					}
-				};
+				});
+		*/
+
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                        // ...
+                    }
+                });
 
 	}
 

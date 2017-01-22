@@ -13,8 +13,6 @@ import android.content.Context;
  */
 public class UpdateMonitor extends IntentService
 {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_FOO = "net.dust_bowl.togetheragain.action.CHECK_IMAGE";
     private static final String ACTION_BAZ = "net.dust_bowl.togetheragain.action.CHECK_PAIR";
 
